@@ -51,3 +51,53 @@ ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} simpleboard.jar
 ENTRYPOINT ["java", "-jar", "/simpleboard.jar"]
 ```
+
+### 4. Setting CI - GitHub Action
+Add .github/workflows/"file name".yml In Your workspace
+```yml
+name: Gradle - CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  build:
+    # 실행 환경 지정
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Set up Java 21
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4.7.0
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
+    # 분리한 application.yml 생성
+    - name: Create application.yml
+      runs: |
+        mkdir -p src/main/resources
+        echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
+
+    # Build Spring Boot Applicaion
+    - name: Build with Gradle
+      run: ./gradlew clean build
+
+    # Build Docker Image
+    - name: Build Docker Image
+      run : docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/simpleboard_action .
+
+    # DockerHub Login
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }} # Don't input your account password
+    
+    # DockerHub Image Push
+    - name: Push Docker Hub
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/simpleboard_action
+```
