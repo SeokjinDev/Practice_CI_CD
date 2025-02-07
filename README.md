@@ -101,3 +101,56 @@ jobs:
     - name: Push Docker Hub
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/simpleboard_action
 ```
+
+### 5. Setting Docker in EC2
+* Env - EC2 OS : Ubuntu 24.04
+1. 우분투 시스템 업데이트
+    ```
+    sudo apt-get update
+    ```
+2. 필요한 패키지 설치
+    ```
+    sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+    ```
+    * apt-transport-https : https로 데이터 및 패키지 접근
+    * ca-certificates : 인증서 기반 SSL 통신 허용
+    * curl : URL로 데이터 서버와 데이터 송수신
+    * gnupg-agent : 보안 통신
+    * software-properties-common : 우분투 공식에 없는 개인 소프트웨어 패키지 저장소
+3. Docker 설정
+    ``` bash
+    # 공식 GPG 키 추가
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    # Docker 공식 apt 저장소 추가
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    ```
+4. 우분투 시스템 업데이트
+    ```
+    sudo apt-get update
+    ```
+5. Docker 설치
+    ``` bash
+    # 설치 명령어
+    sudo apt-get install docker-ce docker-ce-cli containerd.io
+    # 설치 확인
+    sudo systemctl status docker
+    ```
+    * Activate: activate (runing)이면 설치 성공
+    
+6. Docker Compose 최신 버전 확인
+    ```
+    https://github.com/docker/compose/releases
+    ```
+7. Docker Compose 설치
+    ```bash
+    sudo curl -sSL "https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    ```
+
+8. Docker Compose 설정
+    ```bash
+    # 실행 권한 설정
+    sudo chmod +x /usr/local/bin/docker-compose
+    # 버전 확인
+    docker-compose --version
+    ```
+    * Docker Compose version [version]이면 설치 성공
