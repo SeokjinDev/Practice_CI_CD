@@ -164,3 +164,78 @@ jobs:
 1. GitHub Repository -> Setting -> Code and automation -> Actions -> Runners -> New self-hosted runner
 2. Setting your Runner image
 3. Input all commands
+
+### 7. Setting CD - GitHub Action
+Edit .github/workflows/gradle.yml
+```yml
+name: Gradle - CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+permissions:
+  contents: read
+jobs:
+  build-docker-image:
+    # 실행 환경 지정
+    runs-on: ubuntu-24.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Set up Java 21
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4.7.0
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
+    # 분리한 application.yml 생성
+    - name: Create application.yml
+      run: |
+        mkdir -p src/main/resources
+        echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
+
+    # Build Spring Boot Applicaion
+    - name: Set up Permission
+      run: chmod +x ./gradlew
+
+    - name: Build with Gradle
+      run: ./gradlew clean build
+
+    # Build Docker Image
+    - name: BuiSetting CI - GitHub Actionld Docker Image
+      run : docker build -t ${{ sgit@github.com:SeokjinDev/Practice_CI_CD.gitecrets.DOCKERHUB_USERNAME }}/simpleboard_action .
+
+    # DockerHub Login
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }} # Don't input your account password
+    
+    # DockerHub Image Push
+    - name: Push Docker Hub
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/simpleboard_action
+
+  run-on-ec2:
+    needs: build-docker-image
+    runs-on: self-hosted
+
+    steps:
+    # Latest Docker Image Pull
+    - name: docker-pull
+      run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/simpleboard_action
+
+    # Stop Container
+    - name: stop container
+      run: sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
+
+    # Latest Image
+    - name: run new container
+      run: sudo docker run --name github-actions-demo --rm -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/vacation_cicd_action
+    # Delete old image
+    - name: delete old docker image
+      run: sudo docker system prune -f  
+```
