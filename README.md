@@ -41,3 +41,13 @@ https://start.spring.io/
 * 보안을 위해 분리한 application.yml | APPLICATION_YML
 * Dockerfile 사용을 위한 Dockerhub username | DOCKERHUB_USERNAME
 * Dockerfile 사용을 위한 Dockerhub access token | DOCKERHUB_TOKEN
+
+### 3. Setting Dockerfile for Spring Boot Project
+```dockerfile
+# JDK21 Image
+FROM opdnjdk:21
+
+ARG JAR_FILE=build/libs/*.jar
+COPY ${JAR_FILE} simpleboard.jar
+ENTRYPOINT ["java", "-jar", "/simpleboard.jar"]
+```
