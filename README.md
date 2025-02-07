@@ -32,3 +32,12 @@
 ```
 https://start.spring.io/
 ```
+
+### 2. Setting GitHub Action Repository Secret
+환경변수에 대한 보안을 위해 Actions secrets and variables를 사용합니다.
+1. Github Repository -> Settings ->  Secres and Variables -> Actions
+2. Add Repository Secrets
+
+* 보안을 위해 분리한 application.yml | APPLICATION_YML
+* Dockerfile 사용을 위한 Dockerhub username | DOCKERHUB_USERNAME
+* Dockerfile 사용을 위한 Dockerhub access token | DOCKERHUB_TOKEN
