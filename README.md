@@ -154,3 +154,13 @@ jobs:
     docker-compose --version
     ```
     * Docker Compose version [version]이면 설치 성공
+
+### 6. Setting GitHub Actions Runner to self-hosted runner
+* Github Actions Runner
+    * GitHub-Hosted Runner
+        Runner가 GitHub 서버에 위치
+    * Self-Hosted Runner
+        Runner가 사용자의 PC 혹은 Server에 위치
+1. GitHub Repository -> Setting -> Code and automation -> Actions -> Runners -> New self-hosted runner
+2. Setting your Runner image
+3. Input all commands
