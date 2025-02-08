@@ -1,9 +1,9 @@
-name: Gradle - CI
+name: other_branches
 on:
   push:
-    branches: [ "main" ]
+    branches-ignore: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches-ignore: [ "main" ]
 permissions:
   contents: read
 jobs:
@@ -48,24 +48,3 @@ jobs:
     # DockerHub Image Push
     - name: Push Docker Hub
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/simpleboard_action
-
-  run-on-ec2:
-    needs: build-docker-image
-    runs-on: self-hosted
-
-    steps:
-    # Latest Docker Image Pull
-    - name: docker-pull
-      run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/simpleboard_action
-
-    # Stop Container
-    - name: stop container
-      run: sudo docker stop $(sudo docker ps -q) 2>/dev/null || true
-
-    # Latest Image
-    - name: run new container
-      run: sudo docker run --name github-actions-demo --rm -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/simpleboard_action
-      
-    # Delete old image
-    - name: delete old docker image
-      run: sudo docker system prune -f
